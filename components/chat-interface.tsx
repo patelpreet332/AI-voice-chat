@@ -66,7 +66,7 @@ export function ChatInterface() {
     continuous: isLiveMode,
   });
 
-  const userVolume = useAudioMonitor(listening && isLiveMode);
+  const { volume: userVolume, frequencies: userFrequencies } = useAudioMonitor(listening && isLiveMode);
 
   // Echo cancellation & Interruption logic
   useEffect(() => {
@@ -179,6 +179,7 @@ export function ChatInterface() {
         transcript={transcript}
         isLoading={isLoading}
         userVolume={userVolume}
+        userFrequencies={userFrequencies}
         onMicToggle={handleMicClick}
         onStopAudio={stopAudio}
       />

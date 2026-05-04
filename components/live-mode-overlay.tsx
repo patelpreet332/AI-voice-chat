@@ -13,8 +13,27 @@ interface LiveModeOverlayProps {
   transcript: string;
   isLoading: boolean;
   userVolume: number;
+  userFrequencies: number[];
   onMicToggle: () => void;
   onStopAudio: () => void;
+}
+
+function FrequencyBars({ frequencies }: { frequencies: number[] }) {
+  return (
+    <div className="flex items-center justify-center gap-1 h-12 w-full max-w-[200px]">
+      {frequencies.map((freq, i) => (
+        <motion.div
+          key={i}
+          animate={{
+            height: `${Math.max(4, freq * 40)}px`,
+            opacity: 0.2 + (freq * 0.8),
+          }}
+          transition={{ type: "spring", stiffness: 300, damping: 20 }}
+          className="w-1.5 bg-primary rounded-full shadow-[0_0_10px_rgba(34,211,238,0.5)]"
+        />
+      ))}
+    </div>
+  );
 }
 
 export function LiveModeOverlay({
@@ -25,6 +44,7 @@ export function LiveModeOverlay({
   transcript,
   isLoading,
   userVolume,
+  userFrequencies,
   onMicToggle,
   onStopAudio,
 }: LiveModeOverlayProps) {
@@ -97,6 +117,21 @@ export function LiveModeOverlay({
 
           {/* Controls */}
           <div className="w-full max-w-lg flex flex-col items-center gap-8 pb-12">
+            {/* Frequency Visualizer (User End) */}
+            <AnimatePresence>
+              {(isListening && !isPlaying) && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  className="flex flex-col items-center gap-2"
+                >
+                  <FrequencyBars frequencies={userFrequencies} />
+                  <span className="text-[10px] text-primary font-bold tracking-widest uppercase">Live Voice Feed</span>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             {/* Playback Interruption Button (Only shows when AI is speaking) */}
             <AnimatePresence>
               {isPlaying && (
