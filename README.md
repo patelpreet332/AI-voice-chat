@@ -38,38 +38,24 @@ A production-grade, voice-enabled AI assistant built with Next.js 15. Users can 
 
 ## System Architecture
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                     Browser (Client)                     │
-│                                                          │
-│  ┌───────────────────────────────────────────────────┐  │
-│  │              ChatInterface (orchestrator)          │  │
-│  │                                                   │  │
-│  │  useSpeechRecognition  ──►  useChat               │  │
-│  │  (Web Speech API)           (fetch /api/chat)     │  │
-│  │                                                   │  │
-│  │  useAudio              ◄──  AI text response      │  │
-│  │  (SpeechSynthesis)                                │  │
-│  │                                                   │  │
-│  │  useAudioMonitor ──► LiveVisualizer               │  │
-│  │  (MediaStream / Web Audio API)                    │  │
-│  └───────────────────────────────────────────────────┘  │
-└─────────────────────┬───────────────────────────────────┘
-                      │ POST /api/chat
-                      ▼
-┌─────────────────────────────────────────────────────────┐
-│                  Next.js API Route (Server)              │
-│                                                          │
-│  Request validation (Zod)                               │
-│         │                                               │
-│         ▼                                               │
-│  Primary LLM: Groq (llama-3.1-8b-instant)              │
-│         │                                               │
-│         ├── rate limit? ──► Fallback: Gemini            │
-│         │                   (gemini-flash-latest)       │
-│         ▼                                               │
-│  Structured error handling → JSON response              │
-└─────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+  subgraph Client["Browser (Client)"]
+    subgraph Chat["ChatInterface (orchestrator)"]
+      SR["useSpeechRecognition<br/>(Web Speech API)"] --> UC["useChat<br/>(fetch /api/chat)"]
+      AR["AI text response"] --> UA["useAudio<br/>(SpeechSynthesis)"]
+      AM["useAudioMonitor<br/>(MediaStream / Web Audio API)"] --> LV["LiveVisualizer"]
+    end
+  end
+
+  UC -- "POST /api/chat" --> API
+
+  subgraph Server["Next.js API Route (Server)"]
+    API["Request validation (Zod)"] --> GROQ["Primary LLM: Groq<br/>(llama-3.1-8b-instant)"]
+    GROQ -- "rate limit?" --> GEM["Fallback: Gemini<br/>(gemini-flash-latest)"]
+    GROQ --> RESP["Structured error handling<br/>JSON response"]
+    GEM --> RESP
+  end
 ```
 
 ---
@@ -78,48 +64,26 @@ A production-grade, voice-enabled AI assistant built with Next.js 15. Users can 
 
 ### Standard (text or voice) conversation
 
-```
-User speaks / types
-       │
-       ▼
-Speech recognised → transcript debounced (1.5 s silence)
-       │
-       ▼
-Echo-cancellation check (word-overlap ratio against current playback)
-       │ not echo
-       ▼
-POST /api/chat  { message: string }
-       │
-       ▼
-API validates → invokes primary LLM → (fallback if rate-limited)
-       │
-       ▼
-JSON response  { content: string }
-       │
-       ▼
-Message appended to chat history + SpeechSynthesis.speak()
+```mermaid
+flowchart TB
+  U["User speaks / types"] --> S["Speech recognised<br/>transcript debounced (1.5 s silence)"]
+  S --> E["Echo-cancellation check<br/>(word-overlap ratio against current playback)"]
+  E -- "not echo" --> P["POST /api/chat<br/>{ message: string }"]
+  P --> A["API validates<br/>invokes primary LLM<br/>(fallback if rate-limited)"]
+  A --> J["JSON response<br/>{ content: string }"]
+  J --> M["Message appended to chat history<br/>+ SpeechSynthesis.speak()"]
 ```
 
 ### Live Mode
 
-```
-User enables Live Mode
-       │
-       ▼
-Full-screen overlay opens, microphone starts continuously
-       │
-       ▼
-useAudioMonitor samples 16 frequency bands via Web Audio API
-       │
-       ▼
-LiveVisualizer renders real-time animated orb
-       │
-       ▼
-Speech loop (same as above) runs continuously
-       │
-       ▼
-Interruption: if user speech detected while AI is playing,
-word-match ratio < 0.3 → stopAudio() → new request
+```mermaid
+flowchart TB
+  L1["User enables Live Mode"] --> L2["Full-screen overlay opens<br/>microphone starts continuously"]
+  L2 --> L3["useAudioMonitor samples 16 frequency bands<br/>via Web Audio API"]
+  L3 --> L4["LiveVisualizer renders real-time animated orb"]
+  L4 --> L5["Speech loop (same as above)<br/>runs continuously"]
+  L5 --> L6["Interruption condition:<br/>user speech detected while AI is playing"]
+  L6 --> L7["word-match ratio < 0.3<br/>stopAudio()<br/>new request"]
 ```
 
 ---
