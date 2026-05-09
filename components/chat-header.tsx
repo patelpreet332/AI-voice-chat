@@ -4,7 +4,7 @@ export function ChatHeader() {
       <div className="flex items-center gap-3 group cursor-default">
         <div className="w-8 h-8 rounded-lg premium-gradient shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform duration-300" />
         <h1 className="text-xl font-bold tracking-tight text-white">
-          Smt-dev<span className="text-primary text-glow">.</span>
+          SMT<span className="text-primary text-glow">.</span>AI
         </h1>
       </div>
     </header>

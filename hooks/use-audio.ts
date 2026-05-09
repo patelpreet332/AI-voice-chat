@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 
 export const useAudio = () => {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -24,7 +24,6 @@ export const useAudio = () => {
 
         const utterance = new SpeechSynthesisUtterance(text);
         
-        // Choose a nice voice if available
         const voices = window.speechSynthesis.getVoices();
         const preferredVoice = voices.find(v => 
           v.name.includes("Google") || 

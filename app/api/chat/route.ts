@@ -15,15 +15,6 @@ if (!GOOGLE_API_KEY && !GROQ_API_KEY) {
   );
 }
 
-const groqLlm = GROQ_API_KEY
-  ? new ChatGroq({
-      model: CONFIG.GROQ_MODEL,
-      apiKey: GROQ_API_KEY,
-      temperature: 0.7,
-      maxRetries: 2,
-    })
-  : null;
-
 const googleLlm = GOOGLE_API_KEY
   ? new ChatGoogleGenerativeAI({
       model: CONFIG.GEMINI_MODEL,
@@ -96,7 +87,6 @@ async function invokePrimaryWithRateLimitFallback(messages: BaseMessage[]) {
     return await primaryLlm.invoke(messages);
   } catch (error) {
     if (isRateLimitError(error) && googleLlm && primaryLlm !== googleLlm) {
-      console.warn("Primary LLM rate-limited. Falling back to Gemini.");
       try {
         return await googleLlm.invoke(messages);
       } catch (fallbackError) {

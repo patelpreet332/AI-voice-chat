@@ -9,11 +9,8 @@ interface LiveVisualizerProps {
 }
 
 export function LiveVisualizer({ isListening, isPlaying, userVolume }: LiveVisualizerProps) {
-  // Determine color based on state (Cyan for Speaking, Electric Blue for Listening)
   const glowColor = isPlaying ? "rgba(6, 182, 212, 0.6)" : isListening ? "rgba(56, 189, 248, 0.6)" : "rgba(255, 255, 255, 0.1)";
   const coreColor = isPlaying ? "rgba(8, 145, 178, 0.8)" : isListening ? "rgba(14, 165, 233, 0.8)" : "rgba(255, 255, 255, 0.2)";
-
-  // Enhanced pulse based on volume
   const volumeScale = 1 + (userVolume * 1.5);
 
   return (

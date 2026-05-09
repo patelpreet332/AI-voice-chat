@@ -26,7 +26,7 @@ export const useAudioMonitor = (isActive: boolean) => {
         audioContextRef.current = audioContext;
 
         const analyzer = audioContext.createAnalyser();
-        analyzer.fftSize = 64; // Smaller for smoother bar visualization
+        analyzer.fftSize = 64;
         analyzerRef.current = analyzer;
 
         const source = audioContext.createMediaStreamSource(stream);
@@ -41,10 +41,9 @@ export const useAudioMonitor = (isActive: boolean) => {
           let sum = 0;
           const newFrequencies: number[] = [];
           
-          // Capture 16 frequency bands
           for (let i = 0; i < 16; i++) {
             const val = dataArray[i] || 0;
-            newFrequencies.push(val / 255); // Normalize to 0-1
+            newFrequencies.push(val / 255);
             sum += val;
           }
 

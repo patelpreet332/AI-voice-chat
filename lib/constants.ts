@@ -1,9 +1,7 @@
 export const CONFIG = {
   SPEECH_DEBOUNCE_MS: 1500,
-  MAX_TOOL_ITERATIONS: 2,
   GEMINI_MODEL: "gemini-flash-latest",
   GROQ_MODEL: "llama-3.3-70b-versatile",
-  OPENROUTER_MODEL: "google/gemini-flash-1.5-8b:free",
 } as const;
 
 export const SYSTEM_MESSAGES = {

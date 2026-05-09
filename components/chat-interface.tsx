@@ -10,8 +10,7 @@ import { ChatHeader } from "@/components/chat-header";
 import { ChatMessages } from "@/components/chat-messages";
 import { ChatInput } from "@/components/chat-input";
 import { LiveModeOverlay } from "@/components/live-mode-overlay";
-import { AlertCircle, Radio } from "lucide-react";
-import { Button } from "./ui/button";
+import { AlertCircle } from "lucide-react";
 
 export function ChatInterface() {
   const hasMounted = useMounted();
@@ -23,8 +22,6 @@ export function ChatInterface() {
 
   const handleProcessMessage = useCallback(
     async (text: string, reset?: () => void) => {
-      // Don't process if the text is just an echo of the bot's own speech
-      // Increased grace period to 2.5 seconds to handle delayed STT results
       const isRecentlyPlaying = isPlaying || (Date.now() - lastFinishedAt < 2500);
 
       if (isRecentlyPlaying && playingText && text.length > 0) {
@@ -35,11 +32,9 @@ export function ChatInterface() {
           const matchCount = transWords.filter(word => playingWords.includes(word)).length;
           const matchRatio = matchCount / transWords.length;
           
-          // If it's a short 1-2 word sentence and at least one word matches, it's almost certainly an echo
           const isShortEcho = transWords.length <= 2 && matchCount >= 1;
           
           if (matchRatio >= 0.5 || isShortEcho) {
-            console.log("Ignored processed message as it was an echo.", { matchRatio, isShortEcho });
             if (reset) reset();
             return;
           }
@@ -68,7 +63,6 @@ export function ChatInterface() {
 
   const { volume: userVolume, frequencies: userFrequencies } = useAudioMonitor(listening && isLiveMode);
 
-  // Echo cancellation & Interruption logic
   useEffect(() => {
     if (isPlaying && transcript.length > 3) {
       const transWords = transcript.toLowerCase().replace(/[^\w\s]/g, '').split(/\s+/).filter(Boolean);
@@ -79,31 +73,24 @@ export function ChatInterface() {
         const matchRatio = matchCount / transWords.length;
         
         if (matchRatio < 0.3) {
-          // Genuine user interruption
-          console.log("Interrupting audio due to genuine user speech...", { transcript, matchRatio });
           stopAudio();
           resetTranscript();
         } else {
-          // Echo detected - clear it immediately to prevent it from being processed as a new message
           resetTranscript();
         }
       }
     }
   }, [transcript, isPlaying, playingText, stopAudio, resetTranscript]);
 
-  // Track when audio finishes
   useEffect(() => {
     if (!isPlaying) {
       setLastFinishedAt(Date.now());
     }
   }, [isPlaying]);
 
-  // Automatically start listening when Live Mode is enabled
   useEffect(() => {
     if (isLiveMode && !listening) {
       startListening();
-    } else if (!isLiveMode && listening) {
-      // Keep listening if it was already listening, or let the user control it
     }
   }, [isLiveMode, listening, startListening]);
 
