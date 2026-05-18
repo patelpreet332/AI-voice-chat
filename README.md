@@ -1,4 +1,4 @@
-# SMT.AI — Voice Agent
+# ai-voice-chat
 
 A production-grade, voice-enabled AI assistant built with Next.js 15. Users can hold full natural-language conversations with the system using only their voice: speech is transcribed in real time, sent to a multi-provider LLM backend, and the response is played back via browser speech synthesis. A dedicated **Live Mode** provides an immersive, full-screen call experience with real-time audio visualisation and automatic echo cancellation.
 
@@ -113,7 +113,7 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in Chrome or Safari (required for Web Speech API support).
+Open [http://localhost:3000](http://localhost:3000) in browser.
 
 ---
 
@@ -153,59 +153,14 @@ Obtain keys from:
 | **SpeechSynthesis API** | Browser-native text-to-speech playback |
 | **Web Audio API** | Microphone frequency analysis for the live visualiser |
 
-No external database, authentication service, or cloud storage is required.
-
 ---
 
-## Deployment
+## Screenshots Gallery
 
-### Vercel (recommended)
-
-```bash
-npm run build   # verify the build passes locally first
-```
-
-Then connect the repository to Vercel and add `GOOGLE_API_KEY` and `GROQ_API_KEY` as environment variables in the project settings.
-
-### Any Node.js host (VPS, Railway, Render, etc.)
-
-```bash
-npm run build
-npm run start   # listens on PORT env var or 3000 by default
-```
-
-Set the environment variables on the host before starting.
+![AI Voice Chat - 15-09-20](./screenshots/Screenshot%20from%202026-05-18%2015-09-20.png)
+![AI Voice Chat - 16-07-18](./screenshots/Screenshot%20from%202026-05-18%2016-07-18.png)
+![AI Voice Chat - 16-13-30](./screenshots/Screenshot%20from%202026-05-18%2016-13-30.png)
+![AI Voice Chat - 16-15-32](./screenshots/Screenshot%20from%202026-05-18%2016-15-32.png)
+![AI Voice Chat - 16-18-36](./screenshots/Screenshot%20from%202026-05-18%2016-18-36.png)
 
 ---
-
-## Security Notes
-
-- API keys are read exclusively from server-side environment variables — they are never exposed to the client bundle.
-- The `/api/chat` route validates all incoming payloads with Zod before any LLM call.
-- `.env` and `.env.local` are listed in `.gitignore` and will not be committed.
-- `package-lock.json` is excluded from version control to avoid lock-file bloat in generated deployments; regenerate with `npm install` after cloning.
-
----
-
-## Browser Compatibility
-
-The Web Speech API (recognition and synthesis) is supported in:
-
-| Browser | Support |
-|---|---|
-| Google Chrome | Full |
-| Microsoft Edge | Full |
-| Safari (macOS / iOS) | Full |
-| Firefox | Limited / not supported |
-
----
-
-## Screenshots
-
-> Add project screenshots here.
-
----
-
-## License
-
-Proprietary — SMT.AI. All rights reserved.
